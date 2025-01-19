@@ -1,0 +1,45 @@
+.product-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 20px;
+}
+
+.product-card {
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.product-image {
+  width: 100%;
+  height: auto;
+  border-radius: 4px;
+}
+
+.product-name {
+  font-size: 1rem;
+  margin: 10px 0;
+}
+.product-price {
+  color: #28a745; /* Green for the current price */
+  font-weight: bold;
+  font-size: 1.2rem;
+  margin-top: 5px;
+}
+
+.product-old-price {
+  color: #dc3545; /* Red for the old price */
+  text-decoration: line-through;
+  font-weight: normal;
+  margin-right: 10px;
+  font-size: 1rem;
+}
+
+.product-discount {
+  color: #dc3545; /* Red for the discount percentage */
+  font-size: 0.9rem;
+  display: inline-block;
+  margin-left: 5px;
+}
+
