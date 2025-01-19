@@ -9,21 +9,33 @@ function Chat({ onQuery }) {
   const sendMessage = async () => {
     if (!input.trim()) return;
 
-    // Add user message to the chat
-    setMessages((prev) => [...prev, { role: 'user', content: input }]);
+    // 1. Add the user message to local state
+    const newUserMessage = { role: 'user', content: input };
+    const updatedMessages = [...messages, newUserMessage];
 
-    // Fetch response from the backend
-    const response = await axios.post('http://127.0.0.1:8000/api/chat', { message: input });
-
-    // Add AI response to the chat
-    setMessages((prev) => [...prev, { role: 'assistant', content: response.data.response }]);
-
-    // If the AI triggers a search, call the `onQuery` handler
-    if (response.data.query) {
-      onQuery(response.data.query);
-    }
-
+    setMessages(updatedMessages);
     setInput('');
+
+    try {
+      // 2. Send the ENTIRE conversation so far to the backend
+      const response = await axios.post('http://127.0.0.1:8000/api/chat', {
+        conversation: updatedMessages,
+      });
+
+      // 3. Add the LLM/assistant message to local state
+      const newAssistantMessage = {
+        role: 'assistant',
+        content: response.data.response,
+      };
+      setMessages((prev) => [...prev, newAssistantMessage]);
+
+      // 4. If there is a 'query' from the backend, we do a search in the product list
+      if (response.data.query) {
+        onQuery(response.data.query);
+      }
+    } catch (error) {
+      console.error('Error sending message:', error);
+    }
   };
 
   return (
