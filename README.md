@@ -37,28 +37,6 @@ This is a **Conversational Search** application that combines:
 
 ---
 
-## Project Structure
-.
-├── backend
-│   ├── main.py               # FastAPI entry point
-│   ├── Dockerfile            # Dockerfile for FastAPI app
-│   ├── requirements.txt      # Python dependencies
-│   ├── products.json         # Example product data loaded into Meilisearch
-│   └── ...
-├── conversational-search
-│   ├── src
-│   │   ├── components
-│   │   │   ├── Chat.js
-│   │   │   ├── Filters.js
-│   │   │   ├── ProductList.js
-│   │   │   └── SearchBar.js
-│   │   └── ...
-│   ├── package.json
-│   └── ...
-├── telegram_bot.py               # Telegram bot that interacts with the FastAPI backend
-├── docker-compose.yml
-├── .env                      # Environment variables (excluded from git)
-├── README.md
 
 # Getting Started
 
