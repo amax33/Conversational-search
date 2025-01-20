@@ -44,53 +44,47 @@ function App() {
         old_price_usd: product.old_price ? convertToUSD(product.old_price, product.currency) : null,
       }));
       setAllProducts(convertedProducts);
-      setFilteredProducts(convertedProducts);
+      applyFiltersToProducts(convertedProducts, filters); // Ensure filters are applied to new products
     } catch (error) {
       console.error('Error fetching products:', error);
     }
   };
 
-  const handleSearch = (query) => {
-    fetchProducts(query);
-  };
-
-  const applyFilters = (newFilters) => {
-    setFilters(newFilters);
-    applyFiltersToProducts(allProducts, newFilters);
-  };
-
   const applyFiltersToProducts = (products, activeFilters) => {
-  let results = products;
+    let results = products;
 
-  if (activeFilters.priceMin) {
-    results = results.filter(
-      (product) => product.current_price_usd >= activeFilters.priceMin
-    );
-  }
+    if (activeFilters.priceMin) {
+      results = results.filter(
+        (product) => product.current_price_usd >= activeFilters.priceMin
+      );
+    }
 
-  if (activeFilters.priceMax) {
-    results = results.filter(
-      (product) => product.current_price_usd <= activeFilters.priceMax
-    );
-  }
+    if (activeFilters.priceMax) {
+      results = results.filter(
+        (product) => product.current_price_usd <= activeFilters.priceMax
+      );
+    }
 
-  if (activeFilters.category) {
-    results = results.filter((product) => product.category_name === activeFilters.category);
-  }
+    if (activeFilters.category) {
+      results = results.filter((product) => product.category_name === activeFilters.category);
+    }
 
-  if (activeFilters.size) {
-    results = results.filter((product) => product.sizes.includes(activeFilters.size));
-  }
+    if (activeFilters.size) {
+      results = results.filter((product) => product.sizes.includes(activeFilters.size));
+    }
 
-  setFilteredProducts(results);
+    setFilteredProducts(results);
+  };
+
+  const handleSearch = (query) => {
+    fetchProducts(query); // Fetch products matching the query
   };
 
   const handleFiltersUpdate = (newFilters) => {
     const updatedFilters = { ...filters, ...newFilters };
     setFilters(updatedFilters);
-    applyFiltersToProducts(allProducts, updatedFilters);
+    applyFiltersToProducts(allProducts, updatedFilters); // Apply filters to existing products
   };
-
 
   return (
     <div className="app-container">
@@ -99,18 +93,17 @@ function App() {
           <SearchBar onSearch={handleSearch} />
         </div>
         <div className="filters-section">
-          <Filters filters={filters} onApplyFilters={applyFilters} />
+          <Filters filters={filters} onApplyFilters={handleFiltersUpdate} />
         </div>
         <div className="results-section">
           <ProductList products={filteredProducts} />
         </div>
       </div>
       <div className="chat-section">
-        <Chat onQuery={handleSearch} />
+        <Chat onQuery={handleSearch} onFiltersUpdate={handleFiltersUpdate} />
       </div>
     </div>
   );
 }
 
 export default App;
-

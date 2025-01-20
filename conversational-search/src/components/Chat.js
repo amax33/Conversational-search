@@ -25,17 +25,17 @@ function Chat({ onQuery, onFiltersUpdate }) {
       };
       setMessages((prev) => [...prev, newAssistantMessage]);
 
-      // Update filters or search query
+      // If a search query is included, extract and apply filters
       if (response.data.query) {
-        const queryParts = response.data.query.toLowerCase().split('under');
-        const query = queryParts[0].trim();
-        const maxPrice = queryParts.length > 1 ? parseFloat(queryParts[1].replace('$', '').trim()) : null;
+        const query = response.data.query;
+        const priceMatch = query.match(/under\s*(\d+)/i);
+        const maxPrice = priceMatch ? parseFloat(priceMatch[1]) : null;
 
         onFiltersUpdate({
-          priceMax: maxPrice || null,
+          priceMax: maxPrice || null, // Update the max price filter if present
         });
 
-        onQuery(query);
+        onQuery(query); // Fetch products using the extracted query
       }
     } catch (error) {
       console.error('Error sending message:', error);
