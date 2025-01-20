@@ -10,13 +10,14 @@ import uvicorn
 import json
 from typing import List
 from dotenv import load_dotenv
+
 # Load environment variables from .env
 load_dotenv()
 
 def load_products_to_meilisearch():
     index_name = "products"
     try:
-        # Step 1: Check if index already exists
+        # Check if index already exists
         idx = client.get_index(index_name)
         logger.info(f"Index '{index_name}' already exists. Skipping import.")
     except Exception:
@@ -25,7 +26,7 @@ def load_products_to_meilisearch():
         client.create_index(uid=index_name, options={"primaryKey": "id"})
         logger.info(f"Index '{index_name}' created.")
 
-        # Now add your products
+        # Now add products
         try:
             logger.info(f"Importing data into index '{index_name}'.")
             with open("/app/products.json", "r") as f:
@@ -37,43 +38,40 @@ def load_products_to_meilisearch():
             raise RuntimeError("Failed to load products into Meilisearch.")
 
 
-# ----------------------------
+
 # Configure Logging
-# ----------------------------
 # Load keys from environment variables
-# Set environment variables (placeholders)
-OPENAI_API_KEY = "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"
 
-MEILISEARCH_API_KEY = "C0hyZwiDt1nJGF9nF7V75LVXa4GG4C5kuWSSTi4_pg8"
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+MEILISEARCH_API_KEY = os.getenv("MEILISEARCH_API_KEY")
 
-# Ensure the keys are loaded
-if not OPENAI_API_KEY or not MEILISEARCH_API_KEY:
-    raise RuntimeError("Missing required API keys.")
+if not OPENAI_API_KEY:
+    raise RuntimeError("Missing OPENAI_API_KEY environment variable")
+if not MEILISEARCH_API_KEY:
+    raise RuntimeError("Missing MEILISEARCH_API_KEY environment variable")
 
 logging.basicConfig(
     level=logging.DEBUG,
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
-# ----------------------------
+
 # Initialize FastAPI App
-# ----------------------------
 app = FastAPI()
 
-# ----------------------------
+
 # Configure CORS Middleware
-# ----------------------------
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],  # Update with your React app's origin
+    allow_origins=["http://localhost:3000"],
     allow_credentials=True,
     allow_methods=["*"],  # Allow all HTTP methods
     allow_headers=["*"],  # Allow all headers
 )
 
-# ----------------------------
+
 # Initialize Meilisearch Client
-# ----------------------------
 try:
     client = Client(
         "http://meilisearch:7700",
@@ -86,24 +84,22 @@ except Exception as e:
     logger.error("Failed to connect to Meilisearch: %s", e)
     raise RuntimeError("Meilisearch initialization failed.")
 
-# ----------------------------
+
 # Initialize OpenAI LLM
-# ----------------------------
 
 try:
     llm = ChatOpenAI(
         temperature=0.7,
         openai_api_key=OPENAI_API_KEY,
-        openai_proxy="socks5h://host.docker.internal:9090"  # Remove or update if not using a proxy
+        openai_proxy="socks5h://host.docker.internal:9090"
     )
     logger.info("Successfully initialized OpenAI LLM.")
 except Exception as e:
     logger.error("Failed to initialize OpenAI LLM: %s", e)
     raise RuntimeError("OpenAI LLM initialization failed.")
 
-# ----------------------------
-# Define Pydantic Models
-# ----------------------------
+
+# Define Models
 class Message(BaseModel):
     role: str  # "system", "user", or "assistant"
     content: str
@@ -112,14 +108,10 @@ class ChatRequest(BaseModel):
     conversation: List[Message]
 
 
-# ----------------------------
+
 # Search Endpoint
-# ----------------------------
 @app.get("/api/search")
 async def search(query: str = ""):
-    """
-    Search endpoint to fetch products from Meilisearch.
-    """
     logger.debug("Received search query: %s", query)
     try:
         if not query:
@@ -133,9 +125,8 @@ async def search(query: str = ""):
         logger.error("Search failed: %s", e)
         raise HTTPException(status_code=500, detail="Search operation failed.")
 
-# ----------------------------
+
 # Chat Endpoint
-# ----------------------------
 @app.post("/api/chat")
 async def chat(request: ChatRequest):
     conversation = request.conversation
@@ -228,9 +219,7 @@ def format_search_results(results) -> str:
         logger.error("Failed to format search results: %s", e)
         return "Error formatting search results."
 
-# ----------------------------
+
 # Run the App
-# ----------------------------
 if __name__ == "__main__":
     uvicorn.run(app, host="127.0.0.1", port=8000, log_level="debug")
-
