@@ -1,0 +1,33 @@
+version: '3.9'
+
+services:
+  meilisearch:
+    image: getmeili/meilisearch:latest
+    container_name: meilisearch
+    environment:
+      MEILI_MASTER_KEY: "C0hyZwiDt1nJGF9nF7V75LVXa4GG4C5kuWSSTi4_pg8"
+    ports:
+      - "7700:7700"
+    volumes:
+      - ./meili_data:/meili_data
+
+  convsearch:
+    build: .
+    container_name: convsearch
+    env_file:
+      - .env
+    environment:
+      # Point to the host's SOCKS proxy
+      HTTP_PROXY: "socks5h://host.docker.internal:9090"
+      HTTPS_PROXY: "socks5h://host.docker.internal:9090"
+      NO_PROXY: "meilisearch,127.0.0.1,localhost"
+      OPENAI_PROXY: "socks5h://host.docker.internal:9090"
+
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+    ports:
+      - "8000:8000"
+    depends_on:
+      - meilisearch
+
