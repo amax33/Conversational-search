@@ -15,47 +15,41 @@ from dotenv import load_dotenv
 # Load environment variables from .env
 load_dotenv()
 
-# ----------------------------
+
 # Configure Logging
-# ----------------------------
 logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
     level=logging.INFO
 )
 logger = logging.getLogger(__name__)
 
-# ----------------------------
+
 # Proxy Configuration
-# ----------------------------
 PROXY_URL = "socks5h://127.0.0.1:9090"
 
 # Set proxy globally for Requests
 os.environ["HTTP_PROXY"] = PROXY_URL
 os.environ["HTTPS_PROXY"] = PROXY_URL
 
-# ----------------------------
+
 # Configure HTTPXRequest for Telegram Bot
-# ----------------------------
 httpx_request = HTTPXRequest(
     http_version="1.1",  # Ensure HTTP/1.1 is used
     proxy_url=PROXY_URL  # Use the proxy for all Telegram API calls
 )
 
-# ----------------------------
+
 # Constants
-# ----------------------------
 TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 FASTAPI_CHAT_URL = "http://127.0.0.1:8000/api/chat"  # Update with your FastAPI chat endpoint
 
-# ----------------------------
+
 # Conversation Storage
-# ----------------------------
 # Dictionary to store conversation history per user
 user_conversations = {}
 
-# ----------------------------
+
 # Handlers
-# ----------------------------
 
 # Start Command Handler
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -116,12 +110,12 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     if len(caption) > 1024:
                         caption = caption[:1020] + "..."
                     
-                    # Send the first image if available
+                    # Send the image if available
                     if images:
                         try:
                             await context.bot.send_photo(
                                 chat_id=chat_id,
-                                photo=images[0],  # Send the first image
+                                photo=images[0],
                                 caption=caption,
                                 parse_mode="Markdown"
                             )
@@ -142,13 +136,9 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         logger.error("Error sending message to backend: %s", e)
         await update.message.reply_text("Sorry, something went wrong.")
 
-# ----------------------------
+
 # Main Function
-# ----------------------------
 def main():
-    """
-    Main function to initialize and start the Telegram bot.
-    """
     # Initialize the bot application
     application = ApplicationBuilder().token(TELEGRAM_BOT_TOKEN).request(httpx_request).build()
 
@@ -159,9 +149,7 @@ def main():
     # Run the bot
     application.run_polling()
 
-# ----------------------------
+
 # Entry Point
-# ----------------------------
 if __name__ == "__main__":
     main()
-
