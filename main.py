@@ -156,7 +156,7 @@ async def chat(request: ChatRequest):
                     f"{llm_text}\n\nHere are some products:\n{formatted_results}"
                 )
                 return {
-                    "response": response_text,
+                    "response": llm_text.split("search:")[0].strip(),
                     "query": search_query,
                     "filteredResults": search_results["hits"],
                 }

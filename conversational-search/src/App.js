@@ -60,30 +60,37 @@ function App() {
   };
 
   const applyFiltersToProducts = (products, activeFilters) => {
-    let results = products;
+  let results = products;
 
-    if (activeFilters.priceMin) {
-      results = results.filter(
-        (product) => product.current_price_usd >= activeFilters.priceMin
-      );
-    }
+  if (activeFilters.priceMin) {
+    results = results.filter(
+      (product) => product.current_price_usd >= activeFilters.priceMin
+    );
+  }
 
-    if (activeFilters.priceMax) {
-      results = results.filter(
-        (product) => product.current_price_usd <= activeFilters.priceMax
-      );
-    }
+  if (activeFilters.priceMax) {
+    results = results.filter(
+      (product) => product.current_price_usd <= activeFilters.priceMax
+    );
+  }
 
-    if (activeFilters.category) {
-      results = results.filter((product) => product.category_name === activeFilters.category);
-    }
+  if (activeFilters.category) {
+    results = results.filter((product) => product.category_name === activeFilters.category);
+  }
 
-    if (activeFilters.size) {
-      results = results.filter((product) => product.sizes.includes(activeFilters.size));
-    }
+  if (activeFilters.size) {
+    results = results.filter((product) => product.sizes.includes(activeFilters.size));
+  }
 
-    setFilteredProducts(results);
+  setFilteredProducts(results);
   };
+
+  const handleFiltersUpdate = (newFilters) => {
+    const updatedFilters = { ...filters, ...newFilters };
+    setFilters(updatedFilters);
+    applyFiltersToProducts(allProducts, updatedFilters);
+  };
+
 
   return (
     <div className="app-container">
