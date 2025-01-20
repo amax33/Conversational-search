@@ -50,10 +50,15 @@ cd conversational-search
 Create a .env file in the root directory (alongside docker-compose.yml) with the following (example):
 
 OPENAI_API_KEY=<Your OpenAI API Key>
+
 MEILISEARCH_API_KEY=<Your Meilisearch Master Key>
+
 TELEGRAM_BOT_TOKEN=<Your Telegram Bot Token>  # Only needed if using the Telegram bot
 
+
 Note: Make sure not to commit your real .env to GitHub! Add .env to your .gitignore.
+
+
 ## 3. Build & Run with Docker Compose
 
 # Build images
