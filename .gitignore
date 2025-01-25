@@ -1,0 +1,19 @@
+# Exclude the MeiliSearch binary and data
+meilisearch
+meili_data/
+
+# Exclude environment files
+.env
+
+# Node.js dependencies (if applicable)
+node_modules/
+
+# Python virtual environment
+env/
+
+# MacOS system files
+.DS_Store
+
+# Logs
+*.log
+
