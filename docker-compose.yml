@@ -1,0 +1,54 @@
+version: '3.9'
+
+services:
+  meilisearch:
+    image: getmeili/meilisearch:latest
+    container_name: meilisearch
+    env_file:
+      - .env  # Load sensitive environment variables here
+    ports:
+      - "7700:7700"
+    volumes:
+      - ./meili_data:/meili_data
+
+  convsearch:
+    build: .
+    container_name: convsearch
+    env_file:
+      - .env  # Load environment variables from .env
+    environment:
+      HTTP_PROXY: "socks5h://host.docker.internal:9090"
+      HTTPS_PROXY: "socks5h://host.docker.internal:9090"
+      NO_PROXY: "meilisearch,127.0.0.1,localhost"
+      OPENAI_PROXY: "socks5h://host.docker.internal:9090"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    ports:
+      - "8000:8000"
+    depends_on:
+      - meilisearch
+
+  frontend:
+    build:
+      context: ./conversational-search  # Path to your frontend
+    container_name: frontend
+    ports:
+      - "3000:3000"
+    depends_on:
+      - convsearch
+    env_file:
+      - .env  # If frontend requires sensitive keys, load them
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  telegram_bot:
+    build: ./telegrambot
+    container_name: telegram_bot
+    depends_on:
+      - convsearch
+    env_file:
+      - .env  # Load sensitive environment variables here
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    restart: always
+
