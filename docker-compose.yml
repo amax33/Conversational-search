@@ -6,6 +6,8 @@ services:
     container_name: meilisearch
     env_file:
       - .env  # Load sensitive environment variables here
+    environment:
+      MEILI_MASTER_KEY: "C0hyZwiDt1nJGF9nF7V75LVXa4GG4C5kuWSSTi4_pg8"
     ports:
       - "7700:7700"
     volumes:
@@ -21,6 +23,9 @@ services:
       HTTPS_PROXY: "socks5h://host.docker.internal:9090"
       NO_PROXY: "meilisearch,127.0.0.1,localhost"
       OPENAI_PROXY: "socks5h://host.docker.internal:9090"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
     extra_hosts:
       - "host.docker.internal:host-gateway"
     ports:
